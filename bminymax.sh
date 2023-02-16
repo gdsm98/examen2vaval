@@ -1,8 +1,10 @@
 #!/bin/bash
 
+declare -A data
+
 # Leer el archivo consumo.txt y almacenar los datos en un array
 while read -r ciudad mes anio consumo; do
-    data["$ciudad-$mes-$anio"]="$consumo"
+    data["$ciudad-$mes-$anio"]=$consumo
 done < "consumo.txt"
 
 # Obtener la ciudad y mes de consumo máximo
