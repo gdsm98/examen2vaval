@@ -2,11 +2,14 @@
 
 # Leer el archivo consumo.txt y almacenar los consumos por ciudad en un array asociativo
 declare -A consumo
+declare -A num_meses
 while read -r ciudad mes anio consumo; do
     if [[ -v consumos["$ciudad"] ]]; then
         consumos["$ciudad"]=$((consumos["$ciudad"] + consumo))
+        num_meses["$ciudad"]=$((num_meses["$ciudad"] + 1))
     else
         consumos["$ciudad"]=$consumo
+        num_meses["$ciudad"]=1
     fi
 done < "consumo.txt"
 
@@ -15,8 +18,9 @@ ciudad_menor_media=""
 menor_media=-1
 for ciudad in "${!consumos[@]}"; do
     consumo_total=${consumos[$ciudad]}
-    media=$(echo "scale=2; $consumo_total / 7" | bc) # Dividir por 7 para obtener la media
-    if [[ $menor_media -eq -1 || $(echo "$media < $menor_media" | bc -l) -eq 1 ]]; then
+    num_total_meses=${num_meses[$ciudad]}
+    media=$(echo "$consumo_total / $num_total_meses" | bc) # Dividir por el número de meses para obtener la media
+    if [[ $menor_media -eq -1 || $media -lt $menor_media ]]; then
         ciudad_menor_media=$ciudad
         menor_media=$media
     fi
