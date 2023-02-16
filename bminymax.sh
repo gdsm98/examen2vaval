@@ -1,52 +1,26 @@
 #!/bin/bash
 
-while true; do
-    # Pedir al usuario que introduzca la ciudad
-    read -p "Introduce el nombre de la ciudad: " ciudad
+# Leer el archivo consumo.txt y almacenar los datos en un array
+while read -r ciudad mes anio consumo; do
+    data["$ciudad-$mes-$anio"]="$consumo"
+done < "consumo.txt"
 
-    # Comprobar si la ciudad está en la lista de consumos
-    case $ciudad in
-        Valencia|Barcelona|Madrid)
-            break;;
-        *)
-            echo "Ciudad incorrecta. Por favor, introduce una ciudad válida (Valencia, Barcelona o Madrid)." ;;
-    esac
-done
+# Obtener la ciudad y mes de consumo máximo
+max_ciudad_mes=$(echo "${!data[@]}" | tr ' ' '\n' | sort -k2,2 -k3,3 -k1,1 | tail -n1)
+max_ciudad=$(echo "$max_ciudad_mes" | cut -d '-' -f 1)
+max_mes=$(echo "$max_ciudad_mes" | cut -d '-' -f 2)
+max_anio=$(echo "$max_ciudad_mes" | cut -d '-' -f 3)
 
-# Pedir al usuario que introduzca el mes y el año
-read -p "Introduce el mes y el año en formato MM YYYY: " mes anyo
+# Obtener la ciudad y mes de consumo mínimo
+min_ciudad_mes=$(echo "${!data[@]}" | tr ' ' '\n' | sort -k2,2 -k3,3 -k1,1 | head -n1)
+min_ciudad=$(echo "$min_ciudad_mes" | cut -d '-' -f 1)
+min_mes=$(echo "$min_ciudad_mes" | cut -d '-' -f 2)
+min_anio=$(echo "$min_ciudad_mes" | cut -d '-' -f 3)
 
-# Inicializar las variables de máximo y mínimo consumo
-max_consumo=0
-min_consumo=99999999
-
-# Inicializar las variables de ciudad, mes y año correspondientes a los consumos máximo y mínimo
-max_ciudad=""
-max_mes=""
-max_anyo=""
-min_ciudad=""
-min_mes=""
-min_anyo=""
-
-# Buscar el máximo y mínimo consumo para la ciudad y mes/año especificados
-while read c m a consumo; do
-    if [[ $c == $ciudad && $m == $mes && $a == $anyo ]]; then
-        if (( consumo > max_consumo )); then
-            max_consumo=$consumo
-            max_ciudad=$ciudad
-            max_mes=$mes
-            max_anyo=$anyo
-        fi
-        if (( consumo < min_consumo )); then
-            min_consumo=$consumo
-            min_ciudad=$ciudad
-            min_mes=$mes
-            min_anyo=$anyo
-        fi
-    fi
-done < consumos.txt
-
-# Mostrar los resultados al usuario
-echo "El consumo total de $ciudad en $mes $anyo fue de $total."
-echo "El máximo consumo fue de $max_consumo en $max_ciudad en $max_mes $max_anyo."
-echo "El mínimo consumo fue de $min_consumo en $min_ciudad en $min_mes $min_anyo."
+# Imprimir resultados
+echo "Ciudad de consumo máximo: $max_ciudad"
+echo "Mes de consumo máximo: $max_mes"
+echo "Año de consumo máximo: $max_anio"
+echo "Ciudad de consumo mínimo: $min_ciudad"
+echo "Mes de consumo mínimo: $min_mes"
+echo "Año de consumo mínimo: $min_anio"
